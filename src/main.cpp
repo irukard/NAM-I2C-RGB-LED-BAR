@@ -66,9 +66,22 @@ void receiveEvent(uint8_t howMany) {
 
 void setup() {
     pixels.begin();
+    // Neopixel Test Run
+    for (byte i = 0; i < NEONUM; i++) {
+        pixels.setPixelColor(i, pixels.Color(30,0,0));
+        pixels.show();
+        delay(25);
+    }
+    for (byte i = NEONUM; i >= 0; i--) {
+        pixels.setPixelColor(i, pixels.Color(0,0,0));
+        pixels.show();
+        delay(25);
+    }
     TinyWireS.begin(I2C_SLAVE_ADDRESS);
     TinyWireS.onReceive(receiveEvent);
     TinyWireS.onRequest(requestEvent);
+    
+
 }
 
 void loop() {
