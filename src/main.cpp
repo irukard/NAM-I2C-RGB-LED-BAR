@@ -2,12 +2,11 @@
 #include <tinyNeoPixel.h>
 #include <TinyWireS.h>
 
-#define NEOPIN      10
-#define NEONUM   10
+#define NEOPIN 10               // NeoPixel Pin
+#define NEONUM 10               // Number of pixels
+#define I2C_SLAVE_ADDRESS 0x32  // I2C Slave Address
 
 tinyNeoPixel pixels = tinyNeoPixel(NEONUM, NEOPIN, NEO_GRB + NEO_KHZ800);
-
-#define I2C_SLAVE_ADDRESS 0x32
 
 #ifndef TWI_RX_BUFFER_SIZE
 #define TWI_RX_BUFFER_SIZE ( 4 )
