@@ -1,51 +1,28 @@
 #include <Arduino.h>
-#include <NeoPixelBus.h>
+#include <tinyNeoPixel.h>
 
-const uint16_t PixelCount = 10;
-const uint8_t PixelPin = 10;
+#define PIN         10
+#define NUMPIXELS   10
 
-#define colorSaturation 128
+tinyNeoPixel pixels = tinyNeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PixelCount, PixelPin);
-//NeoPixelBus<NeoRgbFeature, Neo400KbpsMethod> strip(PixelCount, PixelPin);
+int delayval = 100; 
 
-RgbColor red(colorSaturation, 0, 0);
-RgbColor green(0, colorSaturation, 0);
-RgbColor blue(0, 0, colorSaturation);
-RgbColor white(colorSaturation);
-RgbColor black(0);
-
-void setup()
-{
-    strip.Begin();
-    strip.Show();
+void setup() {
+    pixels.begin();
 }
 
+void loop() {
 
-void loop()
-{
-  
-    // set the colors, 
-    // if they don't match in order, you need to use NeoGrbFeature feature
-    strip.SetPixelColor(0, red);
-    strip.SetPixelColor(1, green);
-    strip.SetPixelColor(2, blue);
-    strip.SetPixelColor(3, white);
-    // the following line demonstrates rgbw color support
-    // if the NeoPixels are rgbw types the following line will compile
-    // if the NeoPixels are anything else, the following line will give an error
-    //strip.SetPixelColor(3, RgbwColor(colorSaturation));
-    strip.Show();
-
-
-    delay(5000);
-
-    // turn off the pixels
-    strip.SetPixelColor(0, black);
-    strip.SetPixelColor(1, black);
-    strip.SetPixelColor(2, black);
-    strip.SetPixelColor(3, black);
-    strip.Show();
-
-    delay(5000);
+    for(int i=0;i<NUMPIXELS;i++){
+        pixels.setPixelColor(i, pixels.Color(0,150,0));
+        pixels.show();
+        delay(delayval); // Delay for a period of time (in milliseconds).
+    }
+    
+    for(int i=(NUMPIXELS-1);i>=0;i--){
+        pixels.setPixelColor(i, pixels.Color(150,0,0));
+        pixels.show();
+        delay(delayval); // Delay for a period of time (in milliseconds).
+    }
 }
