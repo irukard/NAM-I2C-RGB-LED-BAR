@@ -17,7 +17,7 @@ volatile uint8_t i2c_regs[] =
         {
                 0x0,
                 0x0,
-                0x1,
+                0x0,
                 0x0,
         };
 const byte reg_size = sizeof(i2c_regs);
@@ -39,12 +39,8 @@ void requestEvent() {
  * so be quick, set flags for long running tasks to be called from the mainloop instead of running them directly,
  */
 void receiveEvent(uint8_t howMany) {
-    if (howMany < 1) {
+    if ((howMany < 1) || (howMany > TWI_RX_BUFFER_SIZE)) {
         // Sanity-check
-        return;
-    }
-    if (howMany > TWI_RX_BUFFER_SIZE) {
-        // Also insane number
         return;
     }
 
@@ -64,24 +60,35 @@ void receiveEvent(uint8_t howMany) {
     return;
 }
 
-void setup() {
-    pixels.begin();
-    // Neopixel Test Run
+void testPixels() {
     for (byte i = 0; i < NEONUM; i++) {
         pixels.setPixelColor(i, pixels.Color(30,0,0));
         pixels.show();
-        delay(25);
+        delay(35);
     }
-    for (byte i = NEONUM; i >= 0; i--) {
+    for (byte i = 0; i < NEONUM; i++) {
+        pixels.setPixelColor(i, pixels.Color(0,30,0));
+        pixels.show();
+        delay(35);
+    }
+    for (byte i = 0; i < NEONUM; i++) {
+        pixels.setPixelColor(i, pixels.Color(0,0,30));
+        pixels.show();
+        delay(35);
+    }
+    for (byte i = 0; i < NEONUM; i++) {
         pixels.setPixelColor(i, pixels.Color(0,0,0));
         pixels.show();
-        delay(25);
+        delay(35);
     }
+}
+
+void setup() {
+    pixels.begin();
     TinyWireS.begin(I2C_SLAVE_ADDRESS);
     TinyWireS.onReceive(receiveEvent);
     TinyWireS.onRequest(requestEvent);
-    
-
+    testPixels();
 }
 
 void loop() {
