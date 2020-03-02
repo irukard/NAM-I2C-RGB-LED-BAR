@@ -84,24 +84,15 @@ void testPixels() {
     }
 }
 
-void setup() {
-    pixels.begin();
-    TinyWireS.begin(I2C_SLAVE_ADDRESS);
-    TinyWireS.onReceive(receiveEvent);
-    TinyWireS.onRequest(requestEvent);
-    testPixels();
-}
-
-void loop() {
-
+void updatePixels(){
     byte mode = i2c_regs[0];
     byte cnt = i2c_regs[1];
     byte r = i2c_regs[2];
     byte g = i2c_regs[3];
     byte b = i2c_regs[4];
-    
+
     if (mode == 0) {
-        // Light up first {cnt} LED with {r,g,b} color
+        // Light up first {cnt} LEDs with {r,g,b} color
 
         for (byte i = 0; i < cnt; i++) {
             pixels.setPixelColor(i, pixels.Color(r,g,b));
@@ -118,8 +109,21 @@ void loop() {
         pixels.setPixelColor((cnt - 1), pixels.Color(r,g,b));
         pixels.show();
     }
+}
 
+void setup() {
+    pixels.begin();
+    TinyWireS.begin(I2C_SLAVE_ADDRESS);
+    TinyWireS.onReceive(receiveEvent);
+    TinyWireS.onRequest(requestEvent);
+    testPixels();
+}
+
+void loop() {
+
+    updatePixels();
     tws_delay(10); // Wait 500 ms
 //    TinyWireS_stop_check();
     return;
+
 }
