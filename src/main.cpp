@@ -9,7 +9,7 @@
 tinyNeoPixel pixels = tinyNeoPixel(NEONUM, NEOPIN, NEO_GRB + NEO_KHZ800);
 
 #ifndef TWI_RX_BUFFER_SIZE
-#define TWI_RX_BUFFER_SIZE ( 4 )
+#define TWI_RX_BUFFER_SIZE ( 5 )
 #endif
 
 // The "registers" we expose to I2C
@@ -24,6 +24,7 @@ volatile uint8_t i2c_regs[] =
 const byte reg_size = sizeof(i2c_regs);
 // Tracks the current register pointer position
 volatile byte reg_position=0;
+boolean needsUpdate = true;
 
 /**
  * This is called for each read request we receive, never put more than one byte of data (with TinyWireS.send) to the
@@ -58,6 +59,7 @@ void receiveEvent(uint8_t howMany) {
             reg_position = 0;
         }
     }
+    needsUpdate = true;
     return;
 }
 
@@ -85,29 +87,33 @@ void testPixels() {
 }
 
 void updatePixels(){
-    byte mode = i2c_regs[0];
-    byte cnt = i2c_regs[1];
-    byte r = i2c_regs[2];
-    byte g = i2c_regs[3];
-    byte b = i2c_regs[4];
+    if (needsUpdate) {
 
-    if (mode == 0) {
-        // Light up first {cnt} LEDs with {r,g,b} color
+        byte mode = i2c_regs[0];
+        byte cnt = i2c_regs[1];
+        byte r = i2c_regs[2];
+        byte g = i2c_regs[3];
+        byte b = i2c_regs[4];
 
-        for (byte i = 0; i < cnt; i++) {
-            pixels.setPixelColor(i, pixels.Color(r,g,b));
+        if (mode == 0) {
+            // Light up first {cnt} LEDs with {r,g,b} color
+
+            for (byte i = 0; i < cnt; i++) {
+                pixels.setPixelColor(i, pixels.Color(r,g,b));
+            }
+
+            for (byte i = cnt; i < NEONUM; i++) {
+                pixels.setPixelColor(i, pixels.Color(0,0,0));
+            }
+            pixels.show();
+
+        } else if (mode == 1) {
+            // Light up single {cnt} LED with {r,g,b} color
+
+            pixels.setPixelColor((cnt - 1), pixels.Color(r,g,b));
+            pixels.show();
         }
-
-        for (byte i = cnt; i < NEONUM; i++) {
-            pixels.setPixelColor(i, pixels.Color(0,0,0));
-        }
-        pixels.show();
-
-    } else if (mode == 1) {
-        // Light up single {cnt} LED with {r,g,b} color
-
-        pixels.setPixelColor((cnt - 1), pixels.Color(r,g,b));
-        pixels.show();
+        needsUpdate = false;
     }
 }
 
