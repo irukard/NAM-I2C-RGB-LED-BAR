@@ -101,6 +101,7 @@ void loop() {
     byte b = i2c_regs[4];
     
     if (mode == 0) {
+        // Light up first {cnt} LED with {r,g,b} color
 
         for (byte i = 0; i < cnt; i++) {
             pixels.setPixelColor(i, pixels.Color(r,g,b));
@@ -112,8 +113,9 @@ void loop() {
         pixels.show();
 
     } else if (mode == 1) {
-        
-        pixels.setPixelColor(cnt, pixels.Color(r,g,b));
+        // Light up single {cnt} LED with {r,g,b} color
+
+        pixels.setPixelColor((cnt - 1), pixels.Color(r,g,b));
         pixels.show();
     }
 
