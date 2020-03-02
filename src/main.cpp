@@ -15,10 +15,11 @@ tinyNeoPixel pixels = tinyNeoPixel(NEONUM, NEOPIN, NEO_GRB + NEO_KHZ800);
 // The "registers" we expose to I2C
 volatile uint8_t i2c_regs[] =
         {
-                0x0,
-                0x0,
-                0x0,
-                0x0,
+                0x0,    // mode
+                0x0,    // cnt
+                0x0,    // red
+                0x0,    // green
+                0x0,    // blue
         };
 const byte reg_size = sizeof(i2c_regs);
 // Tracks the current register pointer position
@@ -93,19 +94,29 @@ void setup() {
 
 void loop() {
 
-    byte r = i2c_regs[1];
-    byte g = i2c_regs[2];
-    byte b = i2c_regs[3];
-    byte cnt = i2c_regs[0];
+    byte mode = i2c_regs[0];
+    byte cnt = i2c_regs[1];
+    byte r = i2c_regs[2];
+    byte g = i2c_regs[3];
+    byte b = i2c_regs[4];
+    
+    if (mode == 0) {
 
-    for (byte i = 0; i < cnt; i++) {
-        pixels.setPixelColor(i, pixels.Color(r,g,b));
+        for (byte i = 0; i < cnt; i++) {
+            pixels.setPixelColor(i, pixels.Color(r,g,b));
+        }
+
+        for (byte i = cnt; i < NEONUM; i++) {
+            pixels.setPixelColor(i, pixels.Color(0,0,0));
+        }
+        pixels.show();
+
+    } else if (mode == 1) {
+        
+        pixels.setPixelColor(cnt, pixels.Color(r,g,b));
+        pixels.show();
     }
 
-    for (byte i = cnt; i < NEONUM; i++) {
-        pixels.setPixelColor(i, pixels.Color(0,0,0));
-    }
-    pixels.show();
     tws_delay(10); // Wait 500 ms
 //    TinyWireS_stop_check();
     return;
