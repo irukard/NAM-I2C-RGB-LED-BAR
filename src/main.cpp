@@ -9,7 +9,7 @@
 tinyNeoPixel pixels = tinyNeoPixel(NEONUM, NEOPIN, NEO_GRB + NEO_KHZ800);
 
 #ifndef TWI_RX_BUFFER_SIZE
-#define TWI_RX_BUFFER_SIZE ( 5 )
+#define TWI_RX_BUFFER_SIZE ( 4 )
 #endif
 
 // The "registers" we expose to I2C
