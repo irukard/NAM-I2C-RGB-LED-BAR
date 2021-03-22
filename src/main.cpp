@@ -9,7 +9,7 @@
 tinyNeoPixel pixels = tinyNeoPixel(NEONUM, NEOPIN, NEO_GRB + NEO_KHZ800);
 
 #ifndef TWI_RX_BUFFER_SIZE
-#define TWI_RX_BUFFER_SIZE ( 5 )
+#define TWI_RX_BUFFER_SIZE ( 6 )
 #endif
 
 // The "registers" we expose to I2C
@@ -20,6 +20,7 @@ volatile uint8_t i2c_regs[] =
                 0x0,    // red
                 0x0,    // green
                 0x0,    // blue
+                0x0,    //brightness
         };
 const byte reg_size = sizeof(i2c_regs);
 // Tracks the current register pointer position
@@ -94,12 +95,14 @@ void updatePixels(){
         byte r = i2c_regs[2];
         byte g = i2c_regs[3];
         byte b = i2c_regs[4];
+        byte br = i2c_regs[5];
 
         if (mode == 0) {
             // Light up first {cnt} LEDs with {r,g,b} color
 
             for (byte i = 0; i < cnt; i++) {
                 pixels.setPixelColor(i, pixels.Color(r,g,b));
+                pixels.setBrightness(br);
             }
 
             for (byte i = cnt; i < NEONUM; i++) {
