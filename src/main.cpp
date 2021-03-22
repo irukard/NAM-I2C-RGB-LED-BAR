@@ -76,18 +76,32 @@ void testPixels() {
         delay(35);
     }
     for (byte i = 0; i < NEONUM; i++) {
-        pixels.setPixelColor(i, pixels.Color(0,0,30));
+        pixels.setPixelColor(i, pixels.Color(0, 0, 30));
         pixels.show();
         delay(35);
     }
     for (byte i = 0; i < NEONUM; i++) {
-        pixels.setPixelColor(i, pixels.Color(0,0,0));
+        pixels.setPixelColor(i, pixels.Color(0, 0, 0));
         pixels.show();
         delay(35);
     }
 }
 
-void updatePixels(){
+byte TABLE[] = "\x02\x10\x50\x80\xA0\xD0\xFF\xD0\xA0\x80\x50\x10\x02\x02";
+
+void pulse() {
+    static unsigned long last = 0;
+    static byte curr = 0;
+    if (millis() - last > 120) {
+        last = millis();
+        pixels.setPixelColor(NEONUM - 1, pixels.Color(0, 0, TABLE[curr]));
+        pixels.show();
+        curr++;
+        if (curr == sizeof (TABLE)-1) curr = 0;
+    }
+}
+
+void updatePixels() {
     if (needsUpdate) {
 
         byte mode = i2c_regs[0];
@@ -118,6 +132,7 @@ void updatePixels(){
         }
         needsUpdate = false;
     }
+    pulse();
 }
 
 void setup() {
