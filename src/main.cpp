@@ -9,7 +9,7 @@
 tinyNeoPixel pixels = tinyNeoPixel(NEONUM, NEOPIN, NEO_GRB + NEO_KHZ800);
 
 #ifndef TWI_RX_BUFFER_SIZE
-#define TWI_RX_BUFFER_SIZE ( 6 )
+#define TWI_RX_BUFFER_SIZE ( 5 )
 #endif
 
 // The "registers" we expose to I2C
@@ -20,7 +20,6 @@ volatile uint8_t i2c_regs[] =
                 0x0,    // red
                 0x0,    // green
                 0x0,    // blue
-                0x0,    //brightness
         };
 const byte reg_size = sizeof(i2c_regs);
 // Tracks the current register pointer position
@@ -42,10 +41,17 @@ void requestEvent() {
  * so be quick, set flags for long running tasks to be called from the mainloop instead of running them directly,
  */
 void receiveEvent(uint8_t howMany) {
+    static byte iterator = 10;
+    static byte iterator2 = 10;
+    pixels.setPixelColor(NEONUM - 2,pixels.Color(iterator,0,0) );
+    iterator += 10;
     if ((howMany < 1) || (howMany > TWI_RX_BUFFER_SIZE)) {
+        while (TinyWireS.available()) TinyWireS.receive();
         // Sanity-check
         return;
     }
+    pixels.setPixelColor(NEONUM - 3,pixels.Color(iterator2,0,0) );
+    iterator2 += 10;
 
     while (howMany--) {
         i2c_regs[reg_position] = TinyWireS.receive();
@@ -87,7 +93,7 @@ void testPixels() {
     }
 }
 
-byte TABLE[] = "\x02\x10\x50\x80\xA0\xD0\xFF\xD0\xA0\x80\x50\x10\x02\x02";
+byte TABLE[] = "\x02\x03\x04\x05\x07\x0a\x0F\x0a\x07\x05\x04\x03\x01\x01";
 
 void pulse() {
     static unsigned long last = 0;
@@ -109,17 +115,15 @@ void updatePixels() {
         byte r = i2c_regs[2];
         byte g = i2c_regs[3];
         byte b = i2c_regs[4];
-        byte br = i2c_regs[5];
 
         if (mode == 0) {
             // Light up first {cnt} LEDs with {r,g,b} color
 
             for (byte i = 0; i < cnt; i++) {
                 pixels.setPixelColor(i, pixels.Color(r,g,b));
-                pixels.setBrightness(br);
             }
 
-            for (byte i = cnt; i < NEONUM; i++) {
+            for (byte i = cnt; i < NEONUM-3; i++) {
                 pixels.setPixelColor(i, pixels.Color(0,0,0));
             }
             pixels.show();
