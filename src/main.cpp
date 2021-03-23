@@ -41,17 +41,10 @@ void requestEvent() {
  * so be quick, set flags for long running tasks to be called from the mainloop instead of running them directly,
  */
 void receiveEvent(uint8_t howMany) {
-    static byte iterator = 10;
-    static byte iterator2 = 10;
-    pixels.setPixelColor(NEONUM - 2,pixels.Color(iterator,0,0) );
-    iterator += 10;
     if ((howMany < 1) || (howMany > TWI_RX_BUFFER_SIZE)) {
         while (TinyWireS.available()) TinyWireS.receive();
-        // Sanity-check
         return;
     }
-    pixels.setPixelColor(NEONUM - 3,pixels.Color(iterator2,0,0) );
-    iterator2 += 10;
 
     while (howMany--) {
         i2c_regs[reg_position] = TinyWireS.receive();
@@ -93,19 +86,6 @@ void testPixels() {
     }
 }
 
-byte TABLE[] = "\x02\x03\x04\x05\x07\x0a\x0F\x0a\x07\x05\x04\x03\x01\x01";
-
-void pulse() {
-    static unsigned long last = 0;
-    static byte curr = 0;
-    if (millis() - last > 120) {
-        last = millis();
-        pixels.setPixelColor(NEONUM - 1, pixels.Color(0, 0, TABLE[curr]));
-        pixels.show();
-        curr++;
-        if (curr == sizeof (TABLE)-1) curr = 0;
-    }
-}
 
 void updatePixels() {
     if (needsUpdate) {
@@ -136,7 +116,6 @@ void updatePixels() {
         }
         needsUpdate = false;
     }
-    pulse();
 }
 
 void setup() {
