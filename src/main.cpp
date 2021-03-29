@@ -103,7 +103,7 @@ void updatePixels() {
                 pixels.setPixelColor(i, pixels.Color(r,g,b));
             }
 
-            for (byte i = cnt; i < NEONUM-3; i++) {
+            for (byte i = cnt; i < NEONUM; i++) {
                 pixels.setPixelColor(i, pixels.Color(0,0,0));
             }
             pixels.show();
